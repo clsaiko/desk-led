@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
    /* Parse our arguments; every option seen by parse_opt will be reflected in arguments. */
    argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
-   printf ("ARG1 = %s\nARG2 = %s\nARG3 = %s\n"
+   printf ("RED = %s\nGREEN = %s\nBLUE = %s\n"
            "OUTPUT_FILE = %s\nCONFIG_FILE = %s\nGRADIENT = %s\n"
            "GRADIENT = %s seconds\nVERBOSE = %s\nSILENT = %s\n",
            arguments.args[0], arguments.args[1], arguments.args[2],
