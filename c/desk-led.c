@@ -19,3 +19,38 @@
     along with desk-led.  If not, see <https://www.gnu.org/licenses/>.
     
  */
+
+#include <stdlib.h>
+#include <argp.h>
+// #include <fcntl.h>
+// #include <string.h>
+// #include <termios.h>
+// #include <unistd.h>
+// #include <errno.h>
+
+#include "desk-led.h"
+
+// Using argp example code from http://www.gnu.org/software/libc/manual/html_node/Argp-Example-3.html
+
+const char *argp_program_version =
+  "desk-led 0.1";
+const char *argp_program_bug_address =
+  "<chris.saiko@gmail.com>";
+
+/* Program documentation. */
+static char doc[] =
+  "desk-led -- a program to control WS2812 LED strips attached to an Arduino";
+
+/* A description of the arguments we accept. */
+static char args_doc[] = "ARG1 ARG2";
+
+/* Argument parser. */
+static struct argp argp = { 0, 0, 0, doc };
+
+
+int main(int argc, char** argv) {
+
+  argp_parse (&argp, argc, argv, 0, 0, 0);
+  exit (0);
+
+}
