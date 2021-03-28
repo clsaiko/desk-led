@@ -41,8 +41,8 @@ const char *argp_program_bug_address =
 /* Program documentation. */
 static char doc[] =
   "desk-led -- a program to control WS2812 LED strips attached to an Arduino.\n\n"
-  "            The arguments RED, GREEN, and BLUE are integers from 0 to 255,\n"
-  "            representing the component brightness of a color.";
+  " The arguments RED, GREEN, and BLUE are integers from 0 to 255, representing\n"
+  " the component brightness of a color.";
 
 /* A description of the arguments we accept. */
 static char args_doc[] = "RED GREEN BLUE";
@@ -52,7 +52,7 @@ static struct argp_option options[] = {
   {"verbose",  'v', 0,         0,  "Produce verbose output" },
   {"quiet",    'q', 0,         0,  "Don't produce any output" },
   {"silent",   's', 0,         OPTION_ALIAS },
-  {"gradient", 'g', "SECONDS", 0,  "Change color in a gradient over number of SECONDS" },
+  {"gradient", 'g', "SECONDS", 0,  "Change color in a gradient over SECONDS (0-120]" },
   {"output",   'o', "FILE",    0,  "Output to FILE instead of standard output" },
   {"config",   'c', "FILE",    0,  "Use the supplied FILE to send instructions" },
   { 0 }
@@ -140,11 +140,82 @@ int main(int argc, char** argv) {
            "GRADIENT = %s seconds\nVERBOSE = %s\nSILENT = %s\n",
            arguments.args[0], arguments.args[1], arguments.args[2],
            arguments.output_file,
-           arguments.config_file,
+//           arguments.config_file,
+           "Not Yet Implemented",   //config file NYI
            arguments.gradient ? "yes" : "no",
            arguments.grad_seconds,
            arguments.verbose ? "yes" : "no",
            arguments.silent ? "yes" : "no");
+
+   /* Additional checking of the arguments */
+
+   /* Check gradient seconds bounds */
+   double grad_seconds = atof(arguments.grad_seconds);
+   printf ("\nInput gradient seconds %s parsed as %f\n", arguments.grad_seconds, grad_seconds);
+
+   if (grad_seconds < 0){  //check for negative seconds
+      printf ("\n%f gradient seconds entered.\n"
+              "Seconds must not be negative.\n", grad_seconds);
+      exit(0);
+   }
+
+   if (grad_seconds > 120){   //check for over 2 min
+      printf ("\n%f gradient seconds entered.\n"
+              "Seconds cannot be greater than 120.\n", grad_seconds);
+      exit(0);
+   }
+
+   // if ((grad_seconds == 0.0) && arguments.gradient){  //check for zero
+   //    printf ("\nInvalid gradient seconds entered.\n");
+   //    exit(0);
+   // }
+
+   for (int i = 0; i < strlen(arguments.grad_seconds); i++){
+      //not digit
+      if ( !(isdigit(arguments.grad_seconds[i])) ){
+         //not decimal point
+         if (arguments.grad_seconds[i] != 46){
+            //invalid input for gradient length
+            printf ("\n%s gradient seconds entered.\n"
+                    "Invalid gradient seconds entered.\n", arguments.grad_seconds);
+            exit(0);
+         }
+
+      }
+   }
+
+   /* TODO Check for config file existence */
+
+   /* TODO Parse config file */
+
+   /* Check RGB color input from user*/
+
+   char *endptr;
+   int rgb_red = (int)strtol(arguments.args[0], &endptr, 10);
+   int rgb_green = (int)strtol(arguments.args[1], &endptr, 10);
+   int rgb_blue = (int)strtol(arguments.args[2], &endptr, 10);
+
+   printf ("\nInput red rgb color   %s parsed as %i.\n", arguments.args[0], rgb_red );
+   printf ("\nInput green rgb color %s parsed as %i.\n", arguments.args[1], rgb_green );
+   printf ("\nInput blue rgb color  %s parsed as %i.\n", arguments.args[2], rgb_blue );
+
+   if ((rgb_red > 255) || (rgb_red < 0)) {
+      printf ("\n%s red rgb color entered.\n"
+               "Color must be between 0 and 255.\n", arguments.args[0]);
+      exit(0);     
+   }
+
+   if ((rgb_green > 255) || (rgb_green < 0)) {
+      printf ("\n%s green rgb color entered.\n"
+               "Color must be between 0 and 255.\n", arguments.args[0]);
+      exit(0);     
+   }
+
+   if ((rgb_blue > 255) || (rgb_blue < 0)) {
+      printf ("\n%s blue rgb color entered.\n"
+               "Color must be between 0 and 255.\n", arguments.args[0]);
+      exit(0);     
+   }
 
   exit (0);
 
