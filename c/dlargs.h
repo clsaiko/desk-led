@@ -47,7 +47,8 @@ static struct argp_option options[] = {
   {"verbose",  'v', 0,         0,  "Produce verbose output" },
   {"quiet",    'q', 0,         0,  "Don't produce any output" },
   {"silent",   's', 0,         OPTION_ALIAS },
-  {"gradient", 'g', "SECONDS", 0,  "Change color in a gradient over SECONDS (0-120]" },
+  {"zones",    'z', "ZONES",   0,  "Zones to change. 1 to 3, separated by commas"},
+  {"mode",     'm', "OPTION",  0,  "Enable a particular mode, with an associated OPTION" },
   {"output",   'o', "FILE",    0,  "Output to FILE instead of standard output" },
   {"config",   'c', "FILE",    0,  "Use the supplied FILE to send instructions" },
   { 0 }
@@ -56,9 +57,10 @@ static struct argp_option options[] = {
 /* Used by main to communicate with parse_opt. - argp */
 struct arguments
 {
-  char *args[2];                /* arg1 & arg2 */
-  int silent, verbose,gradient;
-  char *grad_seconds;
+  char *args[3];                /* RED GREEN BLUE */
+  int silent, verbose, mode;
+  char *zones;
+  char *mode_option;
   char *output_file;
   char *config_file;
 };
@@ -78,6 +80,9 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
     case 'v':
       arguments->verbose = 1;
       break;
+    case 'z':
+      arguments->zones = arg;
+      break;
     case 'o':
       arguments->output_file = arg;
       break;
@@ -85,8 +90,8 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
       arguments->config_file = arg;
       break;
     case 'g':
-      arguments->gradient = 1;
-      arguments->grad_seconds = arg;
+      arguments->mode = 1;
+      arguments->mode_option = arg;
       break;
 
     case ARGP_KEY_ARG:

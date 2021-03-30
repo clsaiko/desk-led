@@ -36,8 +36,8 @@ int main(int argc, char** argv) {
   /* Default values. */
   arguments.silent = 0;
   arguments.verbose = 0;
-  arguments.gradient = 0;
-  arguments.grad_seconds = "0";
+  arguments.mode = 0;
+  arguments.mode_option = "0";
   arguments.output_file = "-";
   arguments.config_file = "-";
 
@@ -45,60 +45,61 @@ int main(int argc, char** argv) {
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
   printf ("RED = %s\nGREEN = %s\nBLUE = %s\n"
-          "OUTPUT_FILE = %s\nCONFIG_FILE = %s\nGRADIENT = %s\n"
-          "GRADIENT = %s seconds\nVERBOSE = %s\nSILENT = %s\n",
+          "OUTPUT_FILE = %s\nZONES = %s\nCONFIG_FILE = %s\nMODE = %s\n"
+          "MODE_OPTION = %s seconds\nVERBOSE = %s\nSILENT = %s\n",
           arguments.args[0], arguments.args[1], arguments.args[2],
           arguments.output_file,
+          arguments.zones,
 //           arguments.config_file,
           "Not Yet Implemented",   //config file NYI
-          arguments.gradient ? "yes" : "no",
-          arguments.grad_seconds,
+          arguments.mode ? "yes" : "no",
+          arguments.mode_option,
           arguments.verbose ? "yes" : "no",
           arguments.silent ? "yes" : "no");
 
   /* Additional checking of the arguments */
 
   /* Check gradient seconds bounds */
-  double grad_seconds = atof(arguments.grad_seconds);
-  printf ("\nInput gradient seconds %s parsed as %f", arguments.grad_seconds, grad_seconds);
+  // double grad_seconds = atof(arguments.grad_seconds);
+  // printf ("\nInput gradient seconds %s parsed as %f", arguments.grad_seconds, grad_seconds);
 
-  if (grad_seconds < 0){  //check for negative seconds
-    printf ("\n%f gradient seconds entered.\n"
-            "Seconds must not be negative.\n", grad_seconds);
-    exit(0);
-  }
+  // if (grad_seconds < 0){  //check for negative seconds
+  //   printf ("\n%f gradient seconds entered.\n"
+  //           "Seconds must not be negative.\n", grad_seconds);
+  //   exit(0);
+  // }
 
-  if (grad_seconds > 120){   //check for over 2 min
-    printf ("\n%f gradient seconds entered.\n"
-            "Seconds cannot be greater than 120.\n", grad_seconds);
-    exit(0);
-  }
+  // if (grad_seconds > 120){   //check for over 2 min
+  //   printf ("\n%f gradient seconds entered.\n"
+  //           "Seconds cannot be greater than 120.\n", grad_seconds);
+  //   exit(0);
+  // }
 
   // if ((grad_seconds == 0.0) && arguments.gradient){  //check for zero
   //    printf ("\nInvalid gradient seconds entered.\n");
   //    exit(0);
   // }
 
-  for (int i = 0; i < strlen(arguments.grad_seconds); i++){
-    //not digit
-    if ( !(isdigit(arguments.grad_seconds[i])) ){
-        //not decimal point
-        if (arguments.grad_seconds[i] != 46){
-          //invalid input for gradient length
-          printf ("\n%s gradient seconds entered.\n"
-                  "Invalid gradient seconds entered.\n", arguments.grad_seconds);
-          exit(0);
-        }
+  // for (int i = 0; i < strlen(arguments.grad_seconds); i++){
+  //   //not digit
+  //   if ( !(isdigit(arguments.grad_seconds[i])) ){
+  //       //not decimal point
+  //       if (arguments.grad_seconds[i] != 46){
+  //         //invalid input for gradient length
+  //         printf ("\n%s gradient seconds entered.\n"
+  //                 "Invalid gradient seconds entered.\n", arguments.grad_seconds);
+  //         exit(0);
+  //       }
 
-    }
-  }
+  //   }
+  // }
 
   /* Check RGB color input from user*/
 
   char *endptr;
-  int rgb_red = (int)strtol(arguments.args[0], &endptr, 10);
-  int rgb_green = (int)strtol(arguments.args[1], &endptr, 10);
-  int rgb_blue = (int)strtol(arguments.args[2], &endptr, 10);
+  unsigned int rgb_red = (unsigned int)strtol(arguments.args[0], &endptr, 10);
+  unsigned int rgb_green = (unsigned int)strtol(arguments.args[1], &endptr, 10);
+  unsigned int rgb_blue = (unsigned int)strtol(arguments.args[2], &endptr, 10);
 
   printf ("\nInput red rgb color    %s parsed as %i", arguments.args[0], rgb_red );
   printf ("\nInput green rgb color  %s parsed as %i", arguments.args[1], rgb_green );
@@ -184,7 +185,7 @@ int main(int argc, char** argv) {
 
   serialCmd[0] = '{';   //start
   serialCmd[1] = 3;     //zone: 1,2  
-  serialCmd[2] = 1;     //mode1:  1 (color)
+  serialCmd[2] = 2;     //mode1:  1 (gradient)
   serialCmd[3] = 'R';   //mode2
   serialCmd[4] = rgb_red;   //R
   serialCmd[5] = rgb_green; //G
@@ -202,7 +203,7 @@ int main(int argc, char** argv) {
           "\nBlue:       %i"
           "\nEnd byte:   %c\n",
            serialCmd[0], (int)serialCmd[1], (int)serialCmd[2], (int)serialCmd[3],
-           (int)serialCmd[4], (int)serialCmd[5], (int)serialCmd[6], serialCmd[7]);
+           (unsigned int)serialCmd[4], (int)serialCmd[5], (int)serialCmd[6], serialCmd[7]);
   // write (fd, "!234567}", 8);
   // printf ("\nSent '!234567}'");
   // sleep(4);
