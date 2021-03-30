@@ -38,17 +38,15 @@ int main(int argc, char** argv) {
   arguments.verbose = 0;
   arguments.mode = 0;
   arguments.mode_option = "0";
-  arguments.output_file = "-";
   arguments.config_file = "-";
 
   /* Parse our arguments; every option seen by parse_opt will be reflected in arguments. */
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
   printf ("RED = %s\nGREEN = %s\nBLUE = %s\n"
-          "OUTPUT_FILE = %s\nZONES = %s\nCONFIG_FILE = %s\nMODE = %s\n"
+          "ZONES = %s\nCONFIG_FILE = %s\nMODE = %s\n"
           "MODE_OPTION = %s seconds\nVERBOSE = %s\nSILENT = %s\n",
           arguments.args[0], arguments.args[1], arguments.args[2],
-          arguments.output_file,
           arguments.zones,
 //           arguments.config_file,
           "Not Yet Implemented",   //config file NYI
@@ -184,8 +182,8 @@ int main(int argc, char** argv) {
   char serialCmd[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
   serialCmd[0] = '{';   //start
-  serialCmd[1] = 3;     //zone: 1,2  
-  serialCmd[2] = 2;     //mode1:  1 (gradient)
+  serialCmd[1] = 1;     //zone: 1,2  
+  serialCmd[2] = 1;     //mode1:  1
   serialCmd[3] = 'R';   //mode2
   serialCmd[4] = rgb_red;   //R
   serialCmd[5] = rgb_green; //G

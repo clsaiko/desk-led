@@ -49,7 +49,6 @@ static struct argp_option options[] = {
   {"silent",   's', 0,         OPTION_ALIAS },
   {"zones",    'z', "ZONES",   0,  "Zones to change. 1 to 3, separated by commas"},
   {"mode",     'm', "OPTION",  0,  "Enable a particular mode, with an associated OPTION" },
-  {"output",   'o', "FILE",    0,  "Output to FILE instead of standard output" },
   {"config",   'c', "FILE",    0,  "Use the supplied FILE to send instructions" },
   { 0 }
 };
@@ -61,7 +60,6 @@ struct arguments
   int silent, verbose, mode;
   char *zones;
   char *mode_option;
-  char *output_file;
   char *config_file;
 };
 
@@ -82,9 +80,6 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
       break;
     case 'z':
       arguments->zones = arg;
-      break;
-    case 'o':
-      arguments->output_file = arg;
       break;
     case 'c':
       arguments->config_file = arg;
