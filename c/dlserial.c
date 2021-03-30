@@ -20,7 +20,8 @@
     
  */
 
-#include <termios.h>
+#include "dlserial.h"
+
 #include <string.h>
 #include <stdio.h>
 
@@ -42,12 +43,17 @@ int set_interface_attribs (int fd, int speed, int parity) {
         // as \000 chars
         tty.c_iflag &= ~IGNBRK;         // disable break processing
         tty.c_lflag = 0;                // no signaling chars, no echo, no canonical processing
+        
         tty.c_oflag = 0;                // no remapping, no delays
         tty.c_cc[VMIN]  = 0;            // read doesn't block
         tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
 
+        /* https://forum.arduino.cc/index.php?topic=28167.msg208341#msg208341 */
+        tty.c_cflag &= ~HUPCL;          // disable hang-up-on-close to avoid reset
+
         tty.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
         tty.c_cflag |= (CLOCAL | CREAD);        // ignore modem controls, enable reading
+        
         tty.c_cflag &= ~(PARENB | PARODD);      // shut off parity
         tty.c_cflag |= parity;        
         tty.c_cflag &= ~CSTOPB;
@@ -61,7 +67,8 @@ int set_interface_attribs (int fd, int speed, int parity) {
 }
 
 /* Serial communication - https://stackoverflow.com/questions/6947413
-   Will probably never use this to set blocking, but the SO answer has it. */
+   Will probably never really use this to set blocking since we never read from the Arduino,
+   but the StackOverflow answer has it. */
 
 void set_blocking (int fd, int should_block) {
 

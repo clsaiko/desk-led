@@ -23,6 +23,8 @@
 #ifndef DLSERIAL_H
 #define DLSERIAL_H
 
+#include <termios.h>
+
 /* Serial communication - https://stackoverflow.com/questions/6947413 */
 int set_interface_attribs (int fd, int speed, int parity);
 
