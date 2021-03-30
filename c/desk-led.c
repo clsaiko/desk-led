@@ -100,9 +100,9 @@ int main(int argc, char** argv) {
   int rgb_green = (int)strtol(arguments.args[1], &endptr, 10);
   int rgb_blue = (int)strtol(arguments.args[2], &endptr, 10);
 
-  printf ("\nInput red rgb color    %s parsed as %i.", arguments.args[0], rgb_red );
-  printf ("\nInput green rgb color  %s parsed as %i.", arguments.args[1], rgb_green );
-  printf ("\nInput blue rgb color   %s parsed as %i.\n", arguments.args[2], rgb_blue );
+  printf ("\nInput red rgb color    %s parsed as %i", arguments.args[0], rgb_red );
+  printf ("\nInput green rgb color  %s parsed as %i", arguments.args[1], rgb_green );
+  printf ("\nInput blue rgb color   %s parsed as %i\n", arguments.args[2], rgb_blue );
 
   if ((rgb_red > 255) || (rgb_red < 0)) {
     printf ("\n%s red rgb color entered.\n"
@@ -159,20 +159,53 @@ int main(int argc, char** argv) {
 
 
 
-  /* Set up serial communication */
+  /* Set up serial communication - https://stackoverflow.com/questions/6947413 */
+  char *portname = "/dev/ttyUSB0";   //connecting Arduino nano defaults here
+
+  int fd = open (portname, O_RDWR | O_NOCTTY | O_SYNC);
+  if (fd < 0){
+          perror ("error opening port");
+          exit (0);
+  }
+
+  set_interface_attribs (fd, B115200, 0);  // set speed to 115,200 bps, 8n1 (no parity)
+  set_blocking (fd, 0);                    // set no blocking
 
 
+  /* Serial communication testing */
+
+  write (fd, "{}", 2);
+  printf ("\nSent %s\nSleep 2", "{}");
+
+  sleep(2); //don't just send data again right away, let the Arduino catch its breath
 
 
+  char serialCmd[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
+  serialCmd[0] = '{';   //start
+  serialCmd[1] = 3;     //zone: 1,2  
+  serialCmd[2] = 1;     //mode1:  1 (color)
+  serialCmd[3] = 'R';   //mode2
+  serialCmd[4] = rgb_red;   //R
+  serialCmd[5] = rgb_green; //G
+  serialCmd[6] = rgb_blue;  //B
+  serialCmd[7] = '}';       //end
 
-
-
-
-
-
-
+  write (fd, serialCmd, 8);
+  printf ("\nSent %s\n", serialCmd);
+  printf ("\nStart byte: %c"
+          "\nZone byte:  %i"
+          "\nMode1 byte: %i"
+          "\nMode2 byte: %i"
+          "\nRed:        %i"
+          "\nGreen:      %i"
+          "\nBlue:       %i"
+          "\nEnd byte:   %c\n",
+           serialCmd[0], (int)serialCmd[1], (int)serialCmd[2], (int)serialCmd[3],
+           (int)serialCmd[4], (int)serialCmd[5], (int)serialCmd[6], serialCmd[7]);
+  // write (fd, "!234567}", 8);
+  // printf ("\nSent '!234567}'");
+  // sleep(4);
 
   exit (0);
-
 }
