@@ -47,9 +47,10 @@ static char args_doc[] = "RED GREEN BLUE";
 static struct argp_option options[] = {
   {"verbose",  'v', 0,         0,  "Produce verbose output" },
   {"quiet",    'q', 0,         0,  "Don't produce any output" },
-  {"zones",    'z', "ZONES",   0,  "Zones to change. 1 to 3, separated by commas"},
-  {"smooth",   's', "SECONDS", 0,  "Smooth transition, over duration in SECONDS"},
-  {"breathe",  'b', "SECONDS", 0,  "Breathe on and off, over duration in SECONDS"},
+  {"cylon",    'c', 0,         0,  "Cylon animation effect. One zone only" },
+  {"zones",    'z', "ZONES",   0,  "Zones to apply, comma separated (ex: 1,2,3)"},
+  {"smooth",   's', "SECONDS", 0,  "Smooth transition in 1 to 120 SECONDS"},
+  {"breathe",  'b', "SECONDS", 0,  "Breathe on and off, over 2 to 10 SECONDS"},
   {"port",     'p', "PORT",    0,  "PORT at which the Arduino may be accessed"},
   { 0 }
 };
@@ -59,7 +60,7 @@ struct arguments
 {
   char *args[3];        /* RED GREEN BLUE */
   int quiet, verbose;   // output
-  int smooth, breathe;   // modes
+  int smooth, breathe, cylon;   // modes
   char *zones;
   char *seconds;
   char *devport;
@@ -82,6 +83,9 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
       break;
     case 'z':
       arguments->zones = arg;
+      break;
+    case 'c':
+      arguments->cylon = 1;
       break;
     case 's':
       arguments->smooth = 1;

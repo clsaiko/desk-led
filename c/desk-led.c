@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
   arguments.verbose = 0;
   arguments.smooth = 0;
   arguments.breathe = 0;
+  arguments.cylon = 0;
   arguments.zones = "0";
   arguments.seconds = "0";
   arguments.devport = "/dev/ttyUSB0";
@@ -46,56 +47,73 @@ int main(int argc, char** argv) {
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
   printf ("RED = %s\nGREEN = %s\nBLUE = %s\n"
-          "SMOOTH = %s\nBREATHE = %s\n"
+          "SMOOTH = %s\nBREATHE = %s\nCYLON = %s\n"
           "MODE_OPTION = %s seconds\nZONES = %s\n"
           "VERBOSE = %s\nQUIET = %s\nPORT = %s\n",
           arguments.args[0], arguments.args[1], arguments.args[2],
           arguments.smooth ? "yes" : "no",
           arguments.breathe ? "yes" : "no",
+          arguments.cylon ? "yes" : "no",
           arguments.seconds,          
           arguments.zones,
           arguments.verbose ? "yes" : "no",
           arguments.quiet ? "yes" : "no",
           arguments.devport);
 
-  /* Additional checking of the arguments */
+  /* Error checking of the arguments */
 
-  /* Check gradient seconds bounds */
-  // double grad_seconds = atof(arguments.grad_seconds);
-  // printf ("\nInput gradient seconds %s parsed as %f", arguments.grad_seconds, grad_seconds);
+  /* Check smooth seconds */
+  if (arguments.smooth){
+    int smooth_seconds = (int)atof(arguments.seconds);
+    printf ("\nInput smooth seconds %s parsed as %i", arguments.seconds, smooth_seconds);
 
-  // if (grad_seconds < 0){  //check for negative seconds
-  //   printf ("\n%f gradient seconds entered.\n"
-  //           "Seconds must not be negative.\n", grad_seconds);
-  //   exit(0);
-  // }
+    if ((smooth_seconds < 1) || (smooth_seconds > 120) ){
+      printf ("\n%i smooth seconds entered.\n", smooth_seconds);
+      printf ("Error: Smooth duration out of bounds. (1 - 120)\n");
+      exit(0);
+    }
+  }
 
-  // if (grad_seconds > 120){   //check for over 2 min
-  //   printf ("\n%f gradient seconds entered.\n"
-  //           "Seconds cannot be greater than 120.\n", grad_seconds);
-  //   exit(0);
-  // }
+  /* Check breathe seconds */
+  if (arguments.breathe){
+    int breathe_seconds = (int)atof(arguments.seconds);
+    printf ("\nInput breathe seconds %s parsed as %i", arguments.seconds, breathe_seconds);
 
-  // if ((grad_seconds == 0.0) && arguments.gradient){  //check for zero
-  //    printf ("\nInvalid gradient seconds entered.\n");
-  //    exit(0);
-  // }
+    if ((breathe_seconds < 2) || (breathe_seconds > 10) ){
+      printf ("\n%i breathe seconds entered.\n", breathe_seconds);
+      printf ("Error: Breathe duration out of bounds. (2 - 10)\n");
+      exit(0);
+    }
+  }
 
-  // for (int i = 0; i < strlen(arguments.grad_seconds); i++){
-  //   //not digit
-  //   if ( !(isdigit(arguments.grad_seconds[i])) ){
-  //       //not decimal point
-  //       if (arguments.grad_seconds[i] != 46){
-  //         //invalid input for gradient length
-  //         printf ("\n%s gradient seconds entered.\n"
-  //                 "Invalid gradient seconds entered.\n", arguments.grad_seconds);
-  //         exit(0);
-  //       }
+  /* Check multiple zone input from user */
 
-  //   }
-  // }
+  //Breathe XOR Smooth XOR Cylon
+  if (!( (arguments.breathe) ^ (arguments.smooth) ^ (arguments.cylon) ) ){
+    printf ("\nError: Multiple modes entered.\n( ");
+    if (arguments.breathe) printf ("Breathe ");
+    if (arguments.smooth) printf ("Smooth ");
+    if (arguments.cylon) printf ("Cylon ");
+    printf(")\n");
+    exit(0);
+  }
 
-  /* Check RGB color input from user*/
+
+  /* Mode seconds input sanity check */
+  for (int i = 0; i < strlen(arguments.seconds); i++){
+    //not digit
+    if ( !(isdigit(arguments.seconds[i])) ){
+      //not decimal point
+      if (arguments.seconds[i] != 46){
+        //invalid input for mode duration
+        printf ("\n%s mode seconds entered.\n"
+                "Error: Invalid mode seconds entered.\n", arguments.seconds);
+        exit(0);
+      }
+    }
+  }
+
+  /* Check RGB color input from user */
 
   char *endptr;
   unsigned int rgb_red = (unsigned int)strtol(arguments.args[0], &endptr, 10);
@@ -154,12 +172,6 @@ int main(int argc, char** argv) {
     }
   }
 
-  /* TODO Check for config file existence */
-
-  /* TODO Parse config file */
-
-
-
 
   /* Set up serial communication - https://stackoverflow.com/questions/6947413 */
   char *portname = "/dev/ttyUSB0";   //connecting Arduino nano defaults here
@@ -177,11 +189,11 @@ int main(int argc, char** argv) {
   /* Serial communication testing */
 
   write (fd, "{}", 2);
-  printf ("\nSent %s\nSleep 2", "{}");
+  //printf ("\nSent %s\nSleep 2", "{}");
 
   sleep(2); //don't just send data again right away, let the Arduino catch its breath
 
-
+  //empty command string
   char serialCmd[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
   serialCmd[0] = '{';   //start
