@@ -37,7 +37,8 @@ const char *argp_program_bug_address =
 static char doc[] =
   "desk-led -- a program to control WS2812 LED strips attached to an Arduino.\n\n"
   " The arguments RED, GREEN, and BLUE are integers from 0 to 255, representing\n"
-  " the component brightness of a color.";
+  " the component brightness of a color.\
+  \vSource available at https://github.com/clsaiko/desk-led";
 
 /* A description of the arguments we accept. - argp */
 static char args_doc[] = "RED GREEN BLUE";
@@ -46,21 +47,20 @@ static char args_doc[] = "RED GREEN BLUE";
 static struct argp_option options[] = {
   {"verbose",  'v', 0,         0,  "Produce verbose output" },
   {"quiet",    'q', 0,         0,  "Don't produce any output" },
-  {"silent",   's', 0,         OPTION_ALIAS },
   {"zones",    'z', "ZONES",   0,  "Zones to change. 1 to 3, separated by commas"},
-  {"mode",     'm', "OPTION",  0,  "Enable a particular mode, with an associated OPTION" },
-  {"config",   'c', "FILE",    0,  "Use the supplied FILE to send instructions" },
+  {"smooth",   's', "SECONDS", 0,  "Smooth transition, over duration in SECONDS"},
+  {"breathe",  'b', "SECONDS", 0,  "Breathe on and off, over duration in SECONDS"},
   { 0 }
 };
 
 /* Used by main to communicate with parse_opt. - argp */
 struct arguments
 {
-  char *args[3];                /* RED GREEN BLUE */
-  int silent, verbose, mode;
+  char *args[3];        /* RED GREEN BLUE */
+  int quiet, verbose;   // output
+  int smooth, breathe;   // modes
   char *zones;
-  char *mode_option;
-  char *config_file;
+  char *seconds;
 };
 
 /* Parse a single option. - argp */
@@ -72,8 +72,8 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
 
   switch (key)
     {
-    case 'q': case 's':
-      arguments->silent = 1;
+    case 'q':
+      arguments->quiet = 1;
       break;
     case 'v':
       arguments->verbose = 1;
@@ -81,12 +81,13 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
     case 'z':
       arguments->zones = arg;
       break;
-    case 'c':
-      arguments->config_file = arg;
+    case 's':
+      arguments->smooth = 1;
+      arguments->seconds = arg;
       break;
-    case 'g':
-      arguments->mode = 1;
-      arguments->mode_option = arg;
+    case 'b':
+      arguments->breathe = 1;
+      arguments->seconds = arg;
       break;
 
     case ARGP_KEY_ARG:

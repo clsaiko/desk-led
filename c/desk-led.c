@@ -34,26 +34,27 @@ int main(int argc, char** argv) {
 
   struct arguments arguments;
   /* Default values. */
-  arguments.silent = 0;
+  arguments.quiet = 0;
   arguments.verbose = 0;
-  arguments.mode = 0;
-  arguments.mode_option = "0";
-  arguments.config_file = "-";
+  arguments.smooth = 0;
+  arguments.breathe = 0;
+  arguments.zones = "0";
+  arguments.seconds = "0";
 
   /* Parse our arguments; every option seen by parse_opt will be reflected in arguments. */
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
   printf ("RED = %s\nGREEN = %s\nBLUE = %s\n"
-          "ZONES = %s\nCONFIG_FILE = %s\nMODE = %s\n"
-          "MODE_OPTION = %s seconds\nVERBOSE = %s\nSILENT = %s\n",
+          "SMOOTH = %s\nBREATHE = %s\n"
+          "MODE_OPTION = %s seconds\nZONES = %s\n"
+          "VERBOSE = %s\nQUIET = %s\n",
           arguments.args[0], arguments.args[1], arguments.args[2],
+          arguments.smooth ? "yes" : "no",
+          arguments.breathe ? "yes" : "no",
+          arguments.seconds,          
           arguments.zones,
-//           arguments.config_file,
-          "Not Yet Implemented",   //config file NYI
-          arguments.mode ? "yes" : "no",
-          arguments.mode_option,
           arguments.verbose ? "yes" : "no",
-          arguments.silent ? "yes" : "no");
+          arguments.quiet ? "yes" : "no");
 
   /* Additional checking of the arguments */
 
