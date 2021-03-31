@@ -50,6 +50,7 @@ static struct argp_option options[] = {
   {"zones",    'z', "ZONES",   0,  "Zones to change. 1 to 3, separated by commas"},
   {"smooth",   's', "SECONDS", 0,  "Smooth transition, over duration in SECONDS"},
   {"breathe",  'b', "SECONDS", 0,  "Breathe on and off, over duration in SECONDS"},
+  {"port",     'p', "PORT",    0,  "PORT at which the Arduino may be accessed"},
   { 0 }
 };
 
@@ -61,6 +62,7 @@ struct arguments
   int smooth, breathe;   // modes
   char *zones;
   char *seconds;
+  char *devport;
 };
 
 /* Parse a single option. - argp */
@@ -84,6 +86,9 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state) {
     case 's':
       arguments->smooth = 1;
       arguments->seconds = arg;
+      break;
+    case 'p':
+      arguments->devport = arg;
       break;
     case 'b':
       arguments->breathe = 1;

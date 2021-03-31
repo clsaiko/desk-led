@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
   arguments.breathe = 0;
   arguments.zones = "0";
   arguments.seconds = "0";
+  arguments.devport = "/dev/ttyUSB0";
 
   /* Parse our arguments; every option seen by parse_opt will be reflected in arguments. */
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
@@ -47,14 +48,15 @@ int main(int argc, char** argv) {
   printf ("RED = %s\nGREEN = %s\nBLUE = %s\n"
           "SMOOTH = %s\nBREATHE = %s\n"
           "MODE_OPTION = %s seconds\nZONES = %s\n"
-          "VERBOSE = %s\nQUIET = %s\n",
+          "VERBOSE = %s\nQUIET = %s\nPORT = %s\n",
           arguments.args[0], arguments.args[1], arguments.args[2],
           arguments.smooth ? "yes" : "no",
           arguments.breathe ? "yes" : "no",
           arguments.seconds,          
           arguments.zones,
           arguments.verbose ? "yes" : "no",
-          arguments.quiet ? "yes" : "no");
+          arguments.quiet ? "yes" : "no",
+          arguments.devport);
 
   /* Additional checking of the arguments */
 
